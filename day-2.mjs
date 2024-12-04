@@ -1,17 +1,4 @@
-import fs from 'fs/promises';
-import path from 'path';
-
-async function readTextFile(filePath) {
-  try {
-    const resolvedPath = path.resolve(filePath);
-    const fileContent = await fs.readFile(resolvedPath, 'utf-8');
-    
-    return fileContent;
-  } catch (error) {
-    console.error('Error reading file:', error);
-    throw error;
-  }
-}
+import { readTextFile } from './utils.mjs';
 
 function checkArrayConditions(arr) {
   if (arr.length < 2) return true;
@@ -70,4 +57,4 @@ async function main() {
   console.log("result: ", tolerateSafeCount);
 }
 
-main()
+main();
