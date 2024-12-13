@@ -1,6 +1,6 @@
 import { readTextFile } from './utils.mjs';
 
-function getAreaAndPerimeterOfRegion(grid) {
+function getAreaRegionMap(grid) {
   let n = grid.length;
   let m = grid[0].length;
   let visited = Array.from(Array(n), () => Array(m).fill(false));
@@ -8,20 +8,52 @@ function getAreaAndPerimeterOfRegion(grid) {
 
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < m; j++) {
-      if (grid[i][j] && !visited[i][j]) {
-        let [area, perimeter] = dfs(i, j, grid[i][j], visited);
-        regionMap.set(`${grid[i][j]}-${i}-${j}`, { area: area, perimeter: perimeter });
+      if (grid[i][j]) {
+        // there could be same character in different regions
+        regionMap.set(`${grid[i][j]}-${i}-${j}`, dfs(i, j, grid[i][j], visited));
       }
     }
   }
 
   function dfs(i, j, k, visited) {
     if (i < 0 || j < 0 || i >= n || j >= m || grid[i][j] !== k || visited[i][j]) {
-      return [0, 0];
+      return 0;
     }
     visited[i][j] = true;
 
     let area = 1;
+
+    area += dfs(i - 1, j, k, visited);
+    area += dfs(i + 1, j, k, visited);
+    area += dfs(i, j - 1, k, visited);
+    area += dfs(i, j + 1, k, visited);
+
+    return area;
+  }
+
+  return regionMap;
+}
+
+function getPerimeterRegionMap(grid) {
+  let n = grid.length;
+  let m = grid[0].length;
+  let visited = Array.from(Array(n), () => Array(m).fill(false));
+  let regionMap = new Map();
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < m; j++) {
+      if (grid[i][j]) {
+        regionMap.set(`${grid[i][j]}-${i}-${j}`, dfs(i, j, grid[i][j], visited));
+      }
+    }
+  }
+
+  function dfs(i, j, k, visited) {
+    if (i < 0 || j < 0 || i >= n || j >= m || grid[i][j] !== k || visited[i][j]) {
+      return 0;
+    }
+    visited[i][j] = true;
+
     let perimeter = 0;
 
     if (i === 0 || grid[i - 1][j] !== k) {
@@ -39,18 +71,16 @@ function getAreaAndPerimeterOfRegion(grid) {
 
     let directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
     for (let [di, dj] of directions) {
-      let [a, p] = dfs(i + di, j + dj, k, visited);
-      area += a;
-      perimeter += p;
+      perimeter += dfs(i + di, j + dj, k, visited);
     }
 
-    return [area, perimeter];
+    return perimeter;
   }
 
   return regionMap;
 }
 
-function getAreaAndSidesOfRegion(grid) {
+function getSidesRegionMap(grid) {
   let n = grid.length;
   let m = grid[0].length;
   let visited = Array.from(Array(n), () => Array(m).fill(false));
@@ -58,21 +88,19 @@ function getAreaAndSidesOfRegion(grid) {
 
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < m; j++) {
-      if (grid[i][j] && !visited[i][j]) {
-        let [area, sides] = dfs(i, j, grid[i][j], visited);
-        regionMap.set(`${grid[i][j]}-${i}-${j}`, { area: area, sides: sides });
+      if (grid[i][j]) {
+        regionMap.set(`${grid[i][j]}-${i}-${j}`, dfs(i, j, grid[i][j], visited));
       }
     }
   }
 
   function dfs(i, j, k, visited) {
     if (i < 0 || j < 0 || i >= n || j >= m || grid[i][j] !== k || visited[i][j]) {
-      return [0, 0];
+      return 0;
     }
     visited[i][j] = true;
 
-    let area = 1;
-    // # of sides == # of corners
+    // There is a key point: # of sides is equal to # of corners
     let corners = 0;
 
     // left-top corner
@@ -115,12 +143,10 @@ function getAreaAndSidesOfRegion(grid) {
 
     let directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
     for (let [di, dj] of directions) {
-      let [a, c] = dfs(i + di, j + dj, k, visited);
-      area += a;
-      corners += c;
+      corners += dfs(i + di, j + dj, k, visited);
     }
 
-    return [area, corners];
+    return corners;
   }
 
   return regionMap;
@@ -134,21 +160,23 @@ async function main() {
     return line.trim().split('');
   });
 
-  // part 1: total price of fencing (area * perimeter)
-  const regionMapUsePerimeter = getAreaAndPerimeterOfRegion(matrix)
-  let totalPriceUsePerimeter = 0;
+  const areaMap = getAreaRegionMap(matrix);
+  const perimeterMap = getPerimeterRegionMap(matrix);
+  const sidesMap = getSidesRegionMap(matrix);
 
-  for(let {area, perimeter} of regionMapUsePerimeter.values()) {
+  // part 1: total price of fencing (area * perimeter)
+  let totalPriceUsePerimeter = 0;
+  for (let [key, area] of areaMap.entries()) {
+    const perimeter = perimeterMap.get(key);
     totalPriceUsePerimeter += area * perimeter;
   }
+
   console.log('totalPrice use primeter result: ', totalPriceUsePerimeter);
 
   // part 2: total price of fencing (area * sides)
-  // There is a important point: # of sides is equal to # of corners
-  const regionMapUseSides = getAreaAndSidesOfRegion(matrix)
   let totalPriceUseSides = 0;
-
-  for(let {area, sides} of regionMapUseSides.values()) {
+  for (let [key, area] of areaMap.entries()) {
+    const sides = sidesMap.get(key);
     totalPriceUseSides += area * sides;
   }
   console.log('totalPrice use sides result: ', totalPriceUseSides);
