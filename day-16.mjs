@@ -63,6 +63,12 @@ function findAllPaths(matrix, start) {
   }
 }
 
+// Dijkstra's algorithm finds the shortest path from a starting node to all other nodes in a weighted graph. 
+// It works by progressively exploring neighboring nodes, selecting the one with the smallest tentative distance, 
+// and updating the distances of its neighbors until the shortest paths to all nodes are found.
+// It guarantees the shortest path in graphs with non-negative weights.
+// 
+// https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1186/lectures/24-Dijkstra_AStar/24-Dijkstra_AStar.pdf
 function dijkstra(matrix, start) {
   const rows = matrix.length;
   const cols = matrix[0].length;
