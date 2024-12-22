@@ -46,7 +46,7 @@ async function main() {
     '>': {x: 2, y: 1},
   };
 
-  function keypadSearchPath(keypad, start, end) {
+  function keypadBFSPath(keypad, start, end) {
     const directions = [
       { x: 0, y: -1, c: '^' },
       { x: 0, y: 1, c: 'v' },
@@ -103,13 +103,13 @@ async function main() {
   // let seq = '';
   // for (let i = 0; i < code.length; i++) {
   //   if (i === 0) {
-  //     seq += keypadSearch(numKeypad, 'A', code[i]);
+  //     seq += keypadBFSPath(numKeypad, 'A', code[i]);
   //   } else {
-  //     seq += keypadSearch(numKeypad, code[i - 1], code[i]);
+  //     seq += keypadBFSPath(numKeypad, code[i - 1], code[i]);
   //   }
   // }
   //
-  // 1. Need to return all the minPaths from `keypadSearchPath` function.
+  // 1. Need to return all the minPaths from `keypadBFSPath` function.
   // 2. Recursively computes the final length for `robotNum - 1` robots and chooses the minimum value.
 
   // need a cache for part 2 iteration
@@ -125,7 +125,7 @@ async function main() {
     let length = 0;
 
     for (const char of code) {
-      const seqs = keypadSearchPath(numpad, current, char);
+      const seqs = keypadBFSPath(numpad, current, char);
       if (robotNum === 0) {
         length += seqs[0].length;
       } else {
