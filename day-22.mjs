@@ -46,33 +46,33 @@ async function main() {
 
   for (let s of secrets) {
     s = BigInt(s);
-		const changeSeqMap = new Map();
-		const fourConsecutiveChanges = [];
-		let prevOnesDigit = s % 10n;
+    const changeSeqMap = new Map();
+    const fourConsecutiveChanges = [];
+    let prevOnesDigit = s % 10n;
     let onesDigit;
 
-		for (let i = 0; i < 2000; i++) {
+    for (let i = 0; i < 2000; i++) {
       s = getNextSecret(s);
       onesDigit = s % 10n;
-			fourConsecutiveChanges.push(onesDigit - prevOnesDigit);
+      fourConsecutiveChanges.push(onesDigit - prevOnesDigit);
 
-			if (fourConsecutiveChanges.length === 4) {
-				const mapKey = fourConsecutiveChanges.join(',');
-				if (!changeSeqMap.has(mapKey)) {
-				  changeSeqMap.set(mapKey, onesDigit);
-				}
-				fourConsecutiveChanges.shift();
-			}
-
-			prevOnesDigit = onesDigit;
+      if (fourConsecutiveChanges.length === 4) {
+        const mapKey = fourConsecutiveChanges.join(',');
+        if (!changeSeqMap.has(mapKey)) {
+          changeSeqMap.set(mapKey, onesDigit);
+        }
+        fourConsecutiveChanges.shift();
+      }
+      
+      prevOnesDigit = onesDigit;
 		}
 
     // put the same key together
-		for (let [key, value] of changeSeqMap.entries()) {
+    for (let [key, value] of changeSeqMap.entries()) {
       seqStartMap.set(key, (seqStartMap.get(key) ?? 0) + Number(value));
-		}
-	}
-
+    }
+  }
+  
   const maxBananas = Math.max(...seqStartMap.values());
   console.log('most bananas you can get:', maxBananas);
 }
