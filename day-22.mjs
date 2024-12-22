@@ -40,6 +40,41 @@ async function main() {
 
   const sum = secretsAfter2000th.reduce((acc, s) => acc + Number(s), 0);
   console.log('sum of the 2000th secret number:', sum);
+
+  // part 2: most bananas you can get (sum of same squence's start position)
+  const seqStartMap = new Map();
+
+  for (let s of secrets) {
+    s = BigInt(s);
+		const changeSeqMap = new Map();
+		const fourConsecutiveChanges = [];
+		let prevOnesDigit = s % 10n;
+    let onesDigit;
+
+		for (let i = 0; i < 2000; i++) {
+      s = getNextSecret(s);
+      onesDigit = s % 10n;
+			fourConsecutiveChanges.push(onesDigit - prevOnesDigit);
+
+			if (fourConsecutiveChanges.length === 4) {
+				const mapKey = fourConsecutiveChanges.join(',');
+				if (!changeSeqMap.has(mapKey)) {
+				  changeSeqMap.set(mapKey, onesDigit);
+				}
+				fourConsecutiveChanges.shift();
+			}
+
+			prevOnesDigit = onesDigit;
+		}
+
+    // put the same key together
+		for (let [key, value] of changeSeqMap.entries()) {
+      seqStartMap.set(key, (seqStartMap.get(key) ?? 0) + Number(value));
+		}
+	}
+
+  const maxBananas = Math.max(...seqStartMap.values());
+  console.log('most bananas you can get:', maxBananas);
 }
 
 main();
