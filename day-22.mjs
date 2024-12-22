@@ -7,7 +7,6 @@ import { readTextFile } from './utils.mjs';
 //   const step1 = (num ^ (num * 64)) % 16777216;
 //   const step2 = (step1 ^ Math.floor(step1 / 32)) % 16777216;
 //   const step3 = (step2 ^ (step2 * 2048)) % 16777216;
-
 //   return step3;
 // }
 
@@ -65,7 +64,7 @@ async function main() {
       }
       
       prevOnesDigit = onesDigit;
-		}
+    }
 
     // put the same key together
     for (let [key, value] of changeSeqMap.entries()) {
